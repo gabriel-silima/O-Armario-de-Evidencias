@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#081526">
+  <meta name="description" content="O Armário de Evidências — aplicação educacional de cadastro, validação e exportação de registros IP/MAC.">
+  <title>O Armário de Evidências · Aula 07</title>
+  <link rel="stylesheet" href="./styles.css">
+  <script type="module" src="./src/app.mjs"></script>
+</head>
+<body>
+  <a class="skip" href="#principal">Pular para o conteúdo</a>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand"><div class="brand-mark">AE</div><div><strong>O Armário<br>de Evidências</strong><small>Laboratório PMGO · SENAC</small></div></div>
+      <p class="side-label">ÁREA DE TRABALHO</p>
+      <nav class="nav" aria-label="Navegação principal">
+        <button class="nav-link active" data-view="inicio" aria-current="page"><span aria-hidden="true">▦</span> Visão geral</button>
+        <button class="nav-link" data-view="cadastro"><span aria-hidden="true">＋</span> Novo registro</button>
+        <button class="nav-link" data-view="acervo"><span aria-hidden="true">≡</span> Acervo de registros</button>
+        <button class="nav-link" data-view="exportar"><span aria-hidden="true">⇩</span> Importar e exportar</button>
+      </nav>
+      <div class="sidebar-footer">
+        <span class="status-dot"></span> Armazenamento local no navegador
+        <small>Protótipo acadêmico. Não é sistema institucional, pericial ou de custódia homologado.</small>
+      </div>
+    </aside>
+    <main id="principal" class="main">
+      <header class="topbar"><div><span class="eyebrow">UC4 / PYTHON · AULA 07</span><h1 id="page-title">Visão geral do acervo</h1></div>
+      <div class="top-actions"><a class="ghost-link" href="https://github.com/gabriel-silima/O-Armario-de-Evidencias" target="_blank" rel="noopener">Repositório ↗</a><button class="button small" id="top-new">+ Novo registro</button></div></header>
+      <div role="status" id="feedback" class="feedback" aria-live="polite" hidden></div>
+      <section class="page active" id="view-inicio">
+        <div class="hero"><div><span class="hero-label">CENTRAL DE ARTEFATOS DIGITAIS</span><h2>Registre. Analise.<br><em>Documente.</em></h2><p>Organize endereços IP e MAC, preserve metadados e exporte informações para o relatório da Aula 07.</p><div class="hero-actions"><button class="button light" id="hero-new">Cadastrar evidência didática</button><button class="button ghost-light" id="load-examples">Carregar exemplos da aula</button></div></div><div class="hero-graphic" aria-hidden="true"><div class="orb"><span>IP</span><span>MAC</span><span>SHA</span></div></div></div>
+        <div class="stats">
+          <article class="stat"><div class="stat-label">REGISTROS NO ACERVO</div><strong id="stat-total">0</strong><small>Armazenados neste navegador</small></article>
+          <article class="stat"><div class="stat-label">FORMATO VÁLIDO</div><strong id="stat-valid">0</strong><small>Validação sintática apenas</small></article>
+          <article class="stat"><div class="stat-label">INCOMPLETOS / INVÁLIDOS</div><strong id="stat-invalid">0</strong><small>Preservados para revisão</small></article>
+          <article class="stat"><div class="stat-label">IP ALVO ENCONTRADO</div><strong id="stat-target">0</strong><small>Ocorrências nos registros</small></article>
+        </div>
+        <div class="columns">
+          <section class="panel"><div class="panel-head"><div><h3>Registros recentes</h3><p>Últimas entradas do acervo local</p></div><button class="text-button" data-view="acervo">Ver todos →</button></div><div id="recent-list" class="recent"></div></section>
+          <section class="panel"><div class="panel-head"><div><h3>Protocolo de análise</h3><p>Etapas da atividade</p></div></div><ol class="protocol"><li><span>01</span><div><b>Coletar</b><small>Registrar valor bruto e procedência declarada</small></div></li><li><span>02</span><div><b>Validar</b><small>Conferir sintaxe e identificar inconsistências</small></div></li><li><span>03</span><div><b>Relatar</b><small>Exportar e arquivar para análise</small></div></li></ol><div class="notice"><strong>Limitação forense</strong><p>O cadastro local não comprova autoria, invasão nem cadeia de custódia jurídica.</p></div></section>
+        </div>
+      </section>
+      <section class="page" id="view-cadastro">
+        <div class="panel form-panel">
+          <div class="panel-head"><div><span class="eyebrow">REGISTRO MANUAL</span><h3 id="form-heading">Adicionar novo registro</h3><p>Dados não informados permanecem em branco. Data de cadastro não é data da coleta.</p></div></div>
+          <form id="record-form" novalidate>
+            <div class="form-grid">
+              <label>Tipo do artefato <span class="required">*</span><select id="tipo" required><option value="IP">Endereço IP</option><option value="MAC">Endereço MAC</option></select></label>
+              <label>Endereço / valor bruto <span class="required">*</span><input id="valor" required maxlength="128" spellcheck="false" placeholder="Ex.: 192.168.0.99" autocomplete="off"></label>
+              <label>Origem / referência declarada<input id="origem" maxlength="240" placeholder="Ex.: exercício, log, equipamento"></label>
+              <label>Responsável pelo registro<input id="responsavel" maxlength="160" placeholder="Nome ou identificação, se conhecida"></label>
+              <label>Data e hora da coleta (se conhecida)<input id="dataColeta" type="datetime-local"></label>
+              <label>Situação da revisão<select id="status"><option value="pendente">Pendente de revisão</option><option value="revisado">Revisado manualmente</option><option value="inconclusivo">Inconclusivo</option></select></label>
+            </div>
+            <label>Observações<textarea id="observacoes" maxlength="2500" rows="4" placeholder="Descreva o contexto, sem afirmar fatos não comprovados."></textarea></label>
+            <p class="form-help" id="form-validation">IPs IPv4/IPv6 e MACs completos são reconhecidos; valores incompletos podem ser registrados com aviso.</p>
+            <div class="form-actions"><button class="button" type="submit" id="save-label">Salvar registro</button><button class="button secondary" type="button" id="cancel-edit">Limpar formulário</button></div>
+          </form>
+        </div>
+      </section>
+      <section class="page" id="view-acervo">
+        <div class="panel">
+          <div class="panel-head"><div><h3>Acervo de registros</h3><p>Pesquise, edite ou remova itens. Ações são anotadas no histórico local.</p></div><button class="button small" data-view="cadastro">+ Adicionar</button></div>
+          <div class="toolbar"><label class="search-label">Pesquisar<input id="search" placeholder="IP, MAC, origem ou observação" type="search"></label><label>Tipo<select id="filter-type"><option value="">Todos</option><option value="IP">IP</option><option value="MAC">MAC</option></select></label><label>Situação<select id="filter-status"><option value="">Todas</option><option value="pendente">Pendente</option><option value="revisado">Revisado</option><option value="inconclusivo">Inconclusivo</option></select></label></div>
+          <div class="table-scroll"><table><thead><tr><th>Tipo</th><th>Registro / validação</th><th>Origem</th><th>Situação</th><th>Cadastro</th><th>Ações</th></tr></thead><tbody id="records-body"></tbody></table></div><div class="table-foot"><span id="table-count">0 registros</span><span>Registros locais · sem sincronização</span></div>
+        </div>
+        <div class="panel"><div class="panel-head"><div><h3>Histórico local de operações</h3><p>Registro auxiliar de inclusões, alterações e exclusões; pode ser modificado pelo usuário do navegador.</p></div></div><div class="history" id="history"></div></div>
+      </section>
+      <section class="page" id="view-exportar">
+        <div class="columns">
+          <div class="panel"><div class="panel-head"><div><h3>Exportar acervo</h3><p>Faça backup antes de limpar dados ou trocar de navegador.</p></div></div>
+          <label>IP de interesse para o resumo<input id="target" value="192.168.0.99" spellcheck="false"></label>
+          <div class="export-actions"><button id="export-json" class="button">Baixar backup JSON + SHA-256</button><button id="export-csv" class="button secondary">Baixar registros CSV</button><button id="print-report" class="button secondary">Imprimir / salvar PDF</button></div>
+          <p class="muted">O PDF desta página usa a opção “Salvar como PDF” do navegador. Para PDF técnico paginado, JSON e ZIP automáticos, use o programa Python/Gradio.</p>
+          <div id="print-area" class="print-area" aria-label="Relatório para impressão"></div></div>
+          <div class="panel"><div class="panel-head"><div><h3>Importar e recuperar</h3><p>Importação de backups JSON; arquivo limitado a 2 MB.</p></div></div>
+          <label>Selecionar arquivo JSON<input type="file" id="import-file" accept=".json,application/json"></label>
+          <button id="import-btn" class="button secondary">Importar registros</button>
+          <div class="divider"></div><h4>Biblioteca de exercícios</h4><p class="muted">Os nove endereços dos slides podem ser adicionados manualmente como registros didáticos, sem substituir o seu acervo.</p>
+          <button class="button secondary" id="secondary-examples">Adicionar exemplos da Aula 07</button>
+          <div class="divider"></div><h4>Limpeza do armazenamento local</h4><p class="muted">A exclusão remove os registros e histórico apenas deste navegador. Exporte antes.</p><button class="button danger" id="clear-all">Apagar acervo local</button></div>
+        </div>
+        <div class="panel resources"><h3>Código e materiais da aplicação</h3><div class="resource-links"><a href="./Aula07_App_Visual_Colab.ipynb" download>Notebook do Colab ↓</a><a href="./python/app.py">Interface Python / Gradio ↗</a><a href="./python/Relatorio_Aula07_Gerador.py">Gerador PDF ↗</a><a href="./python/README.md">Como executar no Windows ↗</a></div></div>
+      </section>
+      <footer>O ARMÁRIO DE EVIDÊNCIAS <span>PMGO / SENAC · Projeto didático de Defesa Cibernética</span></footer>
+    </main>
+  </div>
+</body>
+</html>
