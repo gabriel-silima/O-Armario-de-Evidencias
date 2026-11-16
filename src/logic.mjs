@@ -10,18 +10,35 @@ export function validarIPv4(valor) {
   if (p.length !== 4 || !p.every(x => /^\d{1,3}$/.test(x) && Number(x) <= 255 && (x === "0" || !x.startsWith("0")))) return null;
   return p.map(Number).join(".");
 }
+function validarIPv6(valor) {
+  const s = String(valor || "").trim().toLowerCase();
+  if (!s.includes(":") || !/^[0-9a-f:.]+$/.test(s) || s.length > 45) return null;
+  let v = s;
+  if (v.includes(".")) {
+    const i = v.lastIndexOf(":");
+    if (i < 0) return null;
+    const ipv4 = validarIPv4(v.slice(i+1));
+    if (ipv4 === null) return null;
+    const p = ipv4.split(".").map(Number);
+    v = v.slice(0,i+1) + ((p[0]<<8)|p[1]).toString(16) + ":" + ((p[2]<<8)|p[3]).toString(16);
+  }
+  const duplas = v.split("::");
+  if (duplas.length > 2) return null;
+  const grupos = duplas.length === 2
+    ? [...(duplas[0] ? duplas[0].split(":") : []), ...(duplas[1] ? duplas[1].split(":") : [])]
+    : v.split(":");
+  if (!grupos.every(g=>/^[0-9a-f]{1,4}$/.test(g))) return null;
+  if (duplas.length === 1 && grupos.length !== 8) return null;
+  if (duplas.length === 2 && grupos.length >= 8) return null;
+  return s;
+}
 export function validarIP(valor) {
   const s = String(valor || "").trim();
   const v4 = validarIPv4(s);
-  if (v4 !== null) return { valido:true, normalizado:v4, detalhe:"IPv4" };
-  if (s.includes(":") && /^[0-9a-fA-F:.]+$/.test(s) && s.length <= 45 && s.includes("::") || (
-       s.includes(":") && /^[0-9a-fA-F:.]+$/.test(s) && s.split(":").length === 8)) {
-    try {
-      const host = new URL("http://[" + s + "]/").hostname;
-      if (host.startsWith("[") && host.endsWith("]")) return { valido:true, normalizado:host.slice(1,-1), detalhe:"IPv6" };
-    } catch (_) {}
-  }
-  return { valido:false, normalizado:s, detalhe:"IP inválido ou incompleto" };
+  if (v4 !== null) return {valido:true,normalizado:v4,detalhe:"IPv4"};
+  const v6 = validarIPv6(s);
+  if (v6 !== null) return {valido:true,normalizado:v6,detalhe:"IPv6"};
+  return {valido:false,normalizado:s,detalhe:"IP inválido ou incompleto"};
 }
 export function validarMAC(valor) {
   const s = String(valor || "").trim().toUpperCase();
