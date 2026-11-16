@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+.venv/
+.env
+relatorios_aula07/
+node_modules/
